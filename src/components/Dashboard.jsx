@@ -4,25 +4,55 @@ import { getToken } from "../Logic/SpotifyFetchToken";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState(null)
+  const [searchResults, setSearchResults] = useState(null);
+  const [offset, setOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async (e) => {
-  if (e.key === "Enter") {
-    const token = await getToken();
+    if (e.key === "Enter") {
+      const token = await getToken();
 
-    const response = await fetch(
-      `https://api.spotify.com/v1/search?q=${searchQuery}&type=track,artist`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+      try {
+        // Fetch 3 batches of artists at once
+        const [batch1, batch2, batch3] = await Promise.all([
+          fetch(
+            `https://api.spotify.com/v1/search?q=${searchQuery}&type=artist&offset=0`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+          fetch(
+            `https://api.spotify.com/v1/search?q=${searchQuery}&type=artist&offset=5`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+          fetch(
+            `https://api.spotify.com/v1/search?q=${searchQuery}&type=artist&offset=10`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+        ]);
 
-    const data = await response.json();
-    setSearchResults(data)
-  }
-};
+        const data1 = await batch1.json();
+        const data2 = await batch2.json();
+        const data3 = await batch3.json();
+
+        // Combine all artists
+        const combinedArtists = [
+          ...data1.artists.items,
+          ...data2.artists.items,
+          ...data3.artists.items,
+        ];
+
+        setSearchResults({
+          ...data1,
+          artists: {
+            ...data1.artists,
+            items: combinedArtists,
+          },
+        });
+        setOffset(10);
+      } catch (error) {
+        console.error("Search error:", error);
+      }
+    }
+  };
 
   return (
     <section id="dashboard">
@@ -35,7 +65,10 @@ const Dashboard = () => {
         onKeyPress={handleSearch}
       />
 
-      <div className="header__container">
+      <div
+        className="header__container"
+        style={searchResults ? { paddingTop: "100px" } : {}}
+      >
         {!searchResults ? (
           <div className="header__description">
             <h2 className="header__description--text">
@@ -46,8 +79,20 @@ const Dashboard = () => {
             </h2>
           </div>
         ) : (
-          <div>
-            <p>Results will go here</p>
+          <div className="search__results--container">
+            {console.log("searchResults:", searchResults)}
+            {searchResults.artists?.items?.map((artist) => (
+              <div key={artist.id} className="results__artist--card">
+                {artist.images?.[0] && (
+                  <img
+                    src={artist.images[0].url}
+                    alt={artist.name}
+                    className="results__artist--image"
+                  />
+                )}
+                <p>{artist.name}</p>
+              </div>
+            ))}
           </div>
         )}
       </div>
