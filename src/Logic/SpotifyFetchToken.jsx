@@ -1,5 +1,3 @@
-import React from "react";
-
 const CLIENT_ID = "21d825c243f140b496fd6652cd4f2f6a";
 const REDIRECT_URI = "http://127.0.0.1:3000/callback";
 const SCOPES =
@@ -114,8 +112,3 @@ export async function getToken() {
   return await refreshToken();
 }
 
-const SpotifyFetchToken = () => {
-  return <div>SpotifyFetchToken</div>;
-};
-
-export default SpotifyFetchToken;

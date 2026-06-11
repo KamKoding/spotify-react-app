@@ -18,6 +18,8 @@ li {
 
 body {
   margin: 0;
+  background-color: #121212;
+  color: #f0f0f0;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
     "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
@@ -40,6 +42,7 @@ nav {
   height: 64px;
   width: 100%;
   padding: 0 80px;
+  background-color: #0f0f0f;
 }
 
 .logo__img--icon {
@@ -91,8 +94,52 @@ nav {
 }
 
 .spotify__login--button {
-  margin-top : 16px;
+  margin-top: 16px;
   padding: 16px 0;
   width: 400px;
   align-self: center;
+}
+
+/* dashboard */
+
+#dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.search__bar {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 16px;
+  width: 300px;
+  border: 2px solid #1ab650;
+  border-radius: 25px;
+  font-size: 14px;
+  background: transparent;
+  color: white;
+  outline: none;
+  transition: all 0.7s ease;
+  z-index: 5;
+}
+
+.search__bar:focus {
+  border-color: #1ed760;
+}
+
+.search__bar::placeholder {
+  color: #888;
+}
+
+.search__bar.search--active {
+  top: 72px;
+  right: 32px;
+  left: auto;
+  transform: none;
+  z-index: 10;
 }
