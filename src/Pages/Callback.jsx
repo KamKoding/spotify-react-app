@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { fetchToken } from '../Logic/SpotifyFetchToken.jsx'
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { fetchToken } from "../Logic/SpotifyFetchToken.jsx";
 
 const Callback = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleCallback = async () => {
-      const token = await fetchToken()
+      const token = await fetchToken();
       if (token) {
-        navigate('/')
+        navigate("/");
       }
-    }
+    };
 
-    handleCallback()
-  }, [])
+    handleCallback();
+  }, []);
 
-  return <></>
-}
+  return <div>LOADING...</div>;
+};
 
-export default Callback
+export default Callback;
