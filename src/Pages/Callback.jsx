@@ -1,11 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchToken } from "../Logic/SpotifyFetchToken.jsx";
 
 const Callback = () => {
   const navigate = useNavigate();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const handleCallback = async () => {
       const token = await fetchToken();
       if (token) {
