@@ -9,7 +9,33 @@ const ArtistPage = () => {
   const [artist, setArtist] = useState(null);
   const [topTracks, setTopTracks] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { deviceId, isReady, playerState } = useSpotifyPlayer();
+  const [albumsOffset, setAlbumsOffset] = useState(0);
+  const [albumsTotal, setAlbumsTotal] = useState(0);
+  const { player, deviceId, isReady, playerState } = useSpotifyPlayer();
+
+  const fetchAlbumTracks = async (token, albums) => {
+    const allTracks = [];
+
+    for (const album of albums) {
+      const res = await fetch(
+        `https://api.spotify.com/v1/albums/${album.id}/tracks`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+
+      (data.items || []).forEach((track) => {
+        allTracks.push({
+          ...track,
+          album: {
+            name: album.name,
+            images: album.images,
+          },
+        });
+      });
+    }
+
+    return allTracks;
+  };
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -17,23 +43,40 @@ const ArtistPage = () => {
 
       const artistResponse = await fetch(
         `https://api.spotify.com/v1/artists/${id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       const artistData = await artistResponse.json();
       setArtist(artistData);
 
-      const tracksResponse = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(`artist:${artistData.name}`)}&type=track`,
+      const albumsResponse = await fetch(
+        `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      const tracksData = await tracksResponse.json();
-      setTopTracks(tracksData.tracks?.items || []);
+      const albumsData = await albumsResponse.json();
+      setAlbumsTotal(albumsData.total || 0);
+      setAlbumsOffset(albumsData.items?.length || 0);
+
+      const tracks = await fetchAlbumTracks(token, albumsData.items);
+      setTopTracks(tracks);
     };
 
     fetchArtistData();
   }, [id]);
+
+  const loadMoreTracks = async () => {
+    const token = await getToken();
+
+    const albumsResponse = await fetch(
+      `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single&offset=${albumsOffset}`,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    const albumsData = await albumsResponse.json();
+
+    const newTracks = await fetchAlbumTracks(token, albumsData.items);
+
+    setTopTracks((prev) => [...prev, ...newTracks]);
+    setAlbumsOffset((prev) => prev + albumsData.items.length);
+  };
 
   const formatDuration = (ms) => {
     const minutes = Math.floor(ms / 60000);
@@ -58,8 +101,6 @@ const ArtistPage = () => {
 
   if (!artist) return null;
 
-  console.log("bannerImages:", bannerImages);
-
   return (
     <div className="artist__page">
       <div className="artist__banner">
@@ -82,7 +123,7 @@ const ArtistPage = () => {
         <h2 className="tracks__heading">Popular Tracks</h2>
         {topTracks.map((track, index) => (
           <div
-            key={track.id}
+            key={`${track.id}-${index}`}
             className="track__row"
             onClick={() => isReady && playTrack(deviceId, track.uri)}
           >
@@ -101,8 +142,15 @@ const ArtistPage = () => {
             </span>
           </div>
         ))}
+
+        {albumsOffset < albumsTotal && (
+          <button className="load-more__btn" onClick={loadMoreTracks}>
+            Load More
+          </button>
+        )}
       </div>
-      <NowPlayingBar playerState={playerState} />
+
+      <NowPlayingBar playerState={playerState} player={player} />
     </div>
   );
 };

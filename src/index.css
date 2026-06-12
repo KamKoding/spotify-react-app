@@ -360,6 +360,12 @@ nav {
   background-color: #4d4d4d;
   border-radius: 2px;
   overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+
+.now-playing__progress-bar:hover {
+  height: 6px;
 }
 
 .now-playing__progress-fill {
@@ -367,4 +373,41 @@ nav {
   background-color: #1ed760;
   border-radius: 2px;
   transition: width 1s linear;
+}
+
+.now-playing__play-btn {
+  background-color: #1ed760;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px;
+  transition: transform 0.1s;
+}
+
+.now-playing__play-btn:hover {
+  transform: scale(1.1);
+}
+
+.load-more__btn {
+  margin: 24px auto;
+  display: block;
+  padding: 12px 32px;
+  background-color: transparent;
+  border: 2px solid #1ab650;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.load-more__btn:hover {
+  background-color: #1ab650;
 }
