@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { getToken } from "../Logic/SpotifyFetchToken";
 import { useSpotifyPlayer, playTrack } from "../Logic/useSpotifyPlayer";
 import NowPlayingBar from "../components/NowPlayingBar";
+
+const SORT_FIELDS = {
+  name: (a, b) => a.name.localeCompare(b.name),
+  album: (a, b) => (a.album?.name || "").localeCompare(b.album?.name || ""),
+  duration: (a, b) => a.duration_ms - b.duration_ms,
+};
 
 const ArtistPage = () => {
   const { id } = useParams();
@@ -11,6 +17,7 @@ const ArtistPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [albumsOffset, setAlbumsOffset] = useState(0);
   const [albumsTotal, setAlbumsTotal] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ field: null, direction: "asc" });
   const { player, deviceId, isReady, playerState } = useSpotifyPlayer();
 
   const fetchAlbumTracks = async (token, albums) => {
@@ -78,6 +85,20 @@ const ArtistPage = () => {
     setAlbumsOffset((prev) => prev + albumsData.items.length);
   };
 
+  const handleSort = (field) => {
+    setSortConfig((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  };
+
+  const sortedTracks = useMemo(() => {
+    if (!sortConfig.field) return topTracks;
+    const compareFn = SORT_FIELDS[sortConfig.field];
+    const sorted = [...topTracks].sort(compareFn);
+    return sortConfig.direction === "desc" ? sorted.reverse() : sorted;
+  }, [topTracks, sortConfig]);
+
   const formatDuration = (ms) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -98,6 +119,21 @@ const ArtistPage = () => {
 
     return () => clearInterval(interval);
   }, [bannerImages.length]);
+
+  const SortButton = ({ field, label }) => {
+    const isActive = sortConfig.field === field;
+    return (
+      <button
+        className={`sort__btn ${isActive ? "sort__btn--active" : ""}`}
+        onClick={() => handleSort(field)}
+      >
+        {label}
+        <span className="sort__arrow">
+          {isActive ? (sortConfig.direction === "asc" ? " ↑" : " ↓") : " ↕"}
+        </span>
+      </button>
+    );
+  };
 
   if (!artist) return null;
 
@@ -120,8 +156,17 @@ const ArtistPage = () => {
       </div>
 
       <div className="artist__tracks">
-        <h2 className="tracks__heading">Popular Tracks</h2>
-        {topTracks.map((track, index) => (
+        <div className="tracks__header">
+          <h2 className="tracks__heading">Tracks</h2>
+          <div className="sort__controls">
+            <span className="sort__label">Sort by</span>
+            <SortButton field="name" label="Title" />
+            <SortButton field="album" label="Album" />
+            <SortButton field="duration" label="Duration" />
+          </div>
+        </div>
+
+        {sortedTracks.map((track, index) => (
           <div
             key={`${track.id}-${index}`}
             className="track__row"
