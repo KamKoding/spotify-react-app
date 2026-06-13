@@ -1,5 +1,5 @@
 const CLIENT_ID = "21d825c243f140b496fd6652cd4f2f6a";
-const REDIRECT_URI = "https://spotify-react-app-pe82.vercel.app/";
+const REDIRECT_URI = "https://spotify-react-app-pe82.vercel.app/callback";
 const SCOPES =
   "user-read-private user-read-email user-read-playback-state user-modify-playback-state streaming";
 
