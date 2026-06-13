@@ -9,7 +9,8 @@
 }
 
 a {
-    text-decoration: none;
+  text-decoration: none;
+  color: inherit;
 }
 
 li {
@@ -448,7 +449,9 @@ nav {
   font-size: 13px;
   padding: 6px 14px;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
 }
 
 .sort__btn:hover {
