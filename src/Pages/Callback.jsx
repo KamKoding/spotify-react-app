@@ -6,6 +6,7 @@ const Callback = () => {
   const navigate = useNavigate();
   const hasFetched = useRef(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;

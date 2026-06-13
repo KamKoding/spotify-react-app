@@ -102,25 +102,26 @@ const Dashboard = () => {
     isLoadingRef.current = false;
   };
 
-    useEffect(() => {
-      if (!searchResults) return;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!searchResults) return;
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            loadMoreResults();
-          }
-        },
-        { threshold: 0.1 },
-      );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreResults();
+        }
+      },
+      { threshold: 0.1 },
+    );
 
-      if (observerRef.current) {
-        observer.observe(observerRef.current);
-      }
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
 
-      return () => observer.disconnect();
-    }, [searchResults]);
-
+    return () => observer.disconnect();
+  }, [searchResults]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!searchResults || isLoading) return;
 
