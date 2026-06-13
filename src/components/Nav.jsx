@@ -12,17 +12,17 @@ const Nav = () => {
       </div>
       <ul className="nav__link--list">
         <li className="nav__link">
-            <a className="nav__link--anchor">
+            <a className="nav__link--anchor" href="/">
                 About
             </a>
         </li>
         <li className="nav__link">
-            <a className="nav__link--anchor">
+            <a className="nav__link--anchor" href="/">
                 Contact
             </a>
         </li>
         <li className="nav__link">
-            <a className="nav__link--anchor">
+            <a className="nav__link--anchor" href="/">
                 Charts
             </a>
         </li>
